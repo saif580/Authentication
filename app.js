@@ -2,6 +2,7 @@ const express=require("express");
 const ejs=require("ejs");
 const path=require("path")
 const mongoose=require("mongoose")
+const encrypt=require("mongoose-encryption");
 
 const app=express();
 
@@ -19,10 +20,12 @@ mongoose.connect('mongodb://localhost:27017/authDEMO', {useNewUrlParser: true, u
         console.log(err);
     })
 
-const userSchema={
+const userSchema=new mongoose.Schema({
     email:String,
     password:String
-}
+})
+const secret="Thisisoutsecret"
+userSchema.plugin(encrypt,{secret:secret,encryptedFields: ['password'] })
 
 const User=new mongoose.model("User",userSchema);
 
@@ -45,6 +48,23 @@ app.post('/register',async(req,res)=>{
             res.render("secrets.ejs")
         }
     });
+})
+
+app.post('/login',async(req,res)=>{
+    const {username,password}=req.body;
+    const user=await User.findOne({email:username},function(err,foundUser){
+        if(err){
+            console.log(err)
+        } else {
+            if(foundUser){
+                if(foundUser.password===password){
+                    res.render("secrets.ejs")
+                } else {
+                    res.send("password is incorrect")
+                }
+            }
+        } 
+    })
 })
 
 app.listen(3000,()=>{
