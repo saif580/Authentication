@@ -4,13 +4,24 @@ const ejs=require("ejs");
 const path=require("path")
 const mongoose=require("mongoose")
 const app=express();
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const session = require('express-session');
+const passport=require("passport");
+const passportLocalMongoose=require("passport-local-mongoose");
+
 
 app.use(express.static("public"));
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'))
 app.use(express.urlencoded({extended:true}));
+
+app.use(session({
+    secret: 'I Love My cat!!',
+    resave: false,
+    saveUninitialized: true,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.connect('mongodb://localhost:27017/authDEMO', {useNewUrlParser: true, useUnifiedTopology: true,useFindAndModify:false })
     .then(()=>{
@@ -20,14 +31,20 @@ mongoose.connect('mongodb://localhost:27017/authDEMO', {useNewUrlParser: true, u
         console.log("Something Went Wrong");
         console.log(err);
     })
+mongoose.set('useCreateIndex', true);
 
 const userSchema=new mongoose.Schema({
     email:String,
     password:String
 })
-
+userSchema.plugin(passportLocalMongoose);
 
 const User=new mongoose.model("User",userSchema);
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.get('/',(req,res)=>{ 
     res.render("home.ejs")
@@ -38,39 +55,32 @@ app.get('/login',(req,res)=>{
 app.get('/register',(req,res)=>{
     res.render("register.ejs")
 })
-app.post('/register',async(req,res)=>{
-    await bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-        const {username}=req.body;
-        const newUser=new User({email:username,password:hash});
-        newUser.save((err)=>{
-            if(err) {
-                console.log(err)
-            } else {
-                res.render("secrets.ejs")
-            }
-        });
-    });
-    
+app.get('/secrets',(req,res)=>{
+    if(req.isAuthenticated()){
+        res.render('secrets');
+    } else {
+        res.redirect('/login');
+    }
 })
 
-app.post('/login',async(req,res)=>{
-    const {username,password}=req.body;
-    await User.findOne({email:username},function(err,foundUser){
-        if(err){
-            console.log(err)
-        } else {
-            if(foundUser){
-                bcrypt.compare(password, foundUser.password, function(err, result) {
-                    if(result){
-                        res.render("secrets.ejs");
-                    } else {
-                        console.log(err);
-                    }
-                });
-            }
-        } 
-    })
+app.get('/logout',(req,res)=>{
+    req.logout();
+    res.redirect('/')
 })
+
+app.post('/register',async(req,res)=>{
+        User.register(new User({ username : req.body.username }), req.body.password, function(err, registerUser) {
+        if (err) {
+            console.log(err);
+            res.redirect("/register");
+        }
+        passport.authenticate('local')(req, res, function () {
+          res.redirect('/secrets');
+        });
+    });
+})
+
+app.post('/login',passport.authenticate('local', { successRedirect: 'secrets',failureRedirect: '/login' }));
 
 app.listen(3000,()=>{
     console.log("Server started on port number 3000");
