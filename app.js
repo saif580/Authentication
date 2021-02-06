@@ -10,7 +10,7 @@ const passportLocalMongoose=require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate=require('mongoose-findorcreate');
 const FacebookStrategy=require('passport-facebook');
-
+const dburl=process.env.DB_URL;
 
 app.use(express.static("public"));
 app.set('view engine','ejs');
@@ -26,7 +26,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect('mongodb://localhost:27017/authDEMO', {useNewUrlParser: true, useUnifiedTopology: true,useFindAndModify:false })
+// mongodb://localhost:27017/authDEMO
+mongoose.connect(dburl, {useNewUrlParser: true, useUnifiedTopology: true,useFindAndModify:false })
     .then(()=>{
         console.log("Connection Establish");
     })
