@@ -173,6 +173,7 @@ app.post('/register',async(req,res)=>{
 
 app.post('/login',passport.authenticate('local', { successRedirect: 'secrets',failureRedirect: '/login' }));
 
-app.listen(3000,()=>{
+const port=process.env.PORT||3000;
+app.listen(port,()=>{
     console.log("Server started on port number 3000");
 })
