@@ -64,8 +64,7 @@ passport.use(new GoogleStrategy({
     userProfileURL:"https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    User.findOrCreate({username:profile.emails[0].value, googleId: profile.id }, function (err, user) {
       return cb(err, user);
     });
   }
@@ -76,7 +75,7 @@ app.get('/',(req,res)=>{
 })
 
 app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile'] })
+  passport.authenticate('google', { scope: ['profile',"email"] })
 );
 
 app.get('/auth/google/secrets', 
@@ -96,6 +95,14 @@ app.get('/register',(req,res)=>{
 app.get('/secrets',(req,res)=>{
     if(req.isAuthenticated()){
         res.render('secrets');
+    } else {
+        res.redirect('/login');
+    }
+})
+
+app.get('/submit',(req,res)=>{
+    if(req.isAuthenticated()){
+        res.render('submit');
     } else {
         res.redirect('/login');
     }
