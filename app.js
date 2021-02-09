@@ -91,12 +91,13 @@ app.get('/',(req,res)=>{
     res.render("home.ejs")
 })
 // https://immense-beyond-68906.herokuapp.com/auth/google/secrets
-// /auth/google'
+// /auth/google
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile',"email"] })
 );
 // /auth/google/secrets
-app.get('https://immense-beyond-68906.herokuapp.com/auth/google/secrets', 
+
+app.get('/auth/google/secrets', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     res.redirect('/secrets');
