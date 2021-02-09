@@ -100,7 +100,7 @@ app.get('/auth/google',
 app.get('/auth/google/secrets', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
-    res.redirect('/secrets');
+    res.redirect('https://immense-beyond-68906.herokuapp.com/auth/google/secrets');
 });
 
 app.get("/auth/facebook", passport.authenticate("facebook"));
