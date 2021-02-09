@@ -77,7 +77,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FB_CLIENT,
     clientSecret: process.env.FB_SECRET,
-    callbackURL: "http://localhost:3000/auth/facebook/secrets",
+    callbackURL: "https://immense-beyond-68906.herokuapp.com/auth/facebook/secrets",
     profileFields: ["id", "displayName", "email"],
   },
   function(accessToken, refreshToken, profile, cb) {
