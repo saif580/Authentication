@@ -90,12 +90,13 @@ passport.use(new FacebookStrategy({
 app.get('/',(req,res)=>{ 
     res.render("home.ejs")
 })
-
-app.get('/auth/google',
+// https://immense-beyond-68906.herokuapp.com/auth/google/secrets
+// /auth/google'
+app.get('https://immense-beyond-68906.herokuapp.com/auth/google',
   passport.authenticate('google', { scope: ['profile',"email"] })
 );
-
-app.get('/auth/google/secrets', 
+// /auth/google/secrets
+app.get('https://immense-beyond-68906.herokuapp.com/auth/google/secrets', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     res.redirect('/secrets');
