@@ -93,14 +93,14 @@ app.get('/',(req,res)=>{
 // https://immense-beyond-68906.herokuapp.com/auth/google/secrets
 // /auth/google
 app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile',"email"] })
+  passport.authenticate('google', { scope: ['profile',"email"] }),
+  console.log("sadasd");
 );
 // /auth/google/secrets
 
 app.get('/auth/google/secrets', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
-    console.log("sadasdasdasda")
     res.redirect('https://immense-beyond-68906.herokuapp.com/auth/google/secrets');
 });
 
