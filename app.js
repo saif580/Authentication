@@ -92,7 +92,7 @@ app.get('/',(req,res)=>{
 })
 // https://immense-beyond-68906.herokuapp.com/auth/google/secrets
 // /auth/google'
-app.get('https://immense-beyond-68906.herokuapp.com/auth/google',
+app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile',"email"] })
 );
 // /auth/google/secrets
